@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aetheria Chronicles - MMORPG ระดับตำนาน เปิด CBT 10 ธ.ค. 2569</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Dynamic Meta Pixel Container -->
+    <script id="metaPixelContainer"></script>
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap');
+      body {
+        font-family: 'Kanit', sans-serif;
+        background-color: #0b0e14;
+        color: #e0e6ed;
+      }
+      .gold-glow {
+        box-shadow: 0 0 20px rgba(243, 156, 18, 0.35);
+      }
+      .gold-text-glow {
+        text-shadow: 0 0 18px rgba(241, 196, 15, 0.6);
+      }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
+
+    <!-- Live Announcement Banner (ซ่อนไว้จนกว่าจะมีการประกาศจากแอดมิน) -->
+    <div id="liveAnnouncementBar" class="hidden bg-amber-500/20 border-b border-amber-500/40 text-amber-300 text-center py-2.5 px-4 text-xs md:text-sm font-semibold fixed top-[57px] left-0 w-full z-30 backdrop-blur-md">
+        📢 ประกาศจากทีมงาน: <span id="announcementText"></span>
+    </div>
+
+    <header class="fixed top-0 left-0 w-full z-40 bg-slate-950/90 backdrop-blur-md border-b border-amber-500/20 px-4 md:px-8 py-3.5 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+            <a href="index.html" class="text-2xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-200 to-amber-500 uppercase">AETHERIA</a>
+        </div>
+        <button onclick="scrollToForm()" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-bold px-5 py-2 rounded-lg text-sm md:text-base transition duration-300">
+            ลงทะเบียนล่วงหน้า
+        </button>
+    </header>
+
+    <section class="pt-28 md:pt-36 pb-16 px-4 flex flex-col items-center text-center relative overflow-hidden" style="background: linear-gradient(to bottom, rgba(11, 14, 20, 0.75), rgba(11, 14, 20, 0.98)), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1600') center/cover no-repeat;">
+        <div class="inline-flex items-center space-x-2 bg-red-600/90 text-white text-xs md:text-sm font-bold px-4 py-1.5 rounded-full border border-red-400/30 mb-6 shadow-lg">
+            <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+            <span>เปิดทดสอบ CBT: 10 ธันวาคม 2569</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-amber-200 via-amber-400 to-orange-500 tracking-tight mb-4 uppercase">
+            AETHERIA CHRONICLES
+        </h1>
+        
+        <p class="text-slate-300 text-base sm:text-lg md:text-xl max-w-2xl mb-8 font-light leading-relaxed">
+            สัมผัสการผจญภัยในมหาเวทโอเพ่นเวิลด์ MMORPG ยุคใหม่ ปลุกจิตวิญญาณแห่งการต่อสู้ สร้างตำนานของคุณเองในมหาทวีปอันสาบสูญ
+        </p>
+
+        <!-- Countdown Timer -->
+        <div class="w-full max-w-xl bg-slate-900/80 border border-amber-500/30 rounded-2xl p-4 md:p-6 mb-10 backdrop-blur-md">
+            <h3 class="text-amber-400 text-xs md:text-sm font-semibold uppercase tracking-wider mb-3">นับถอยหลังสู่การเปิดทดสอบ CBT (10 ธ.ค. 2569)</h3>
+            <div class="grid grid-cols-4 gap-2 md:gap-4 text-center">
+                <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-2 md:p-3">
+                    <span id="days" class="text-2xl md:text-4xl font-bold text-amber-300 block">00</span>
+                    <span class="text-xs text-slate-400">วัน</span>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-2 md:p-3">
+                    <span id="hours" class="text-2xl md:text-4xl font-bold text-amber-300 block">00</span>
+                    <span class="text-xs text-slate-400">ชั่วโมง</span>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-2 md:p-3">
+                    <span id="minutes" class="text-2xl md:text-4xl font-bold text-amber-300 block">00</span>
+                    <span class="text-xs text-slate-400">นาที</span>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-2 md:p-3">
+                    <span id="seconds" class="text-2xl md:text-4xl font-bold text-amber-300 block">00</span>
+                    <span class="text-xs text-slate-400">วินาที</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registration Box -->
+        <div id="pre-register-form" class="w-full max-w-md bg-slate-900/90 border border-amber-500/40 rounded-2xl p-6 md:p-8 shadow-2xl backdrop-blur-lg relative z-10">
+            <div class="flex items-center justify-center space-x-2 mb-2">
+                <span class="text-xl">🎁</span>
+                <h2 class="text-xl md:text-2xl font-bold text-amber-300">ลงทะเบียนล่วงหน้า</h2>
+            </div>
+            <p class="text-slate-400 text-xs md:text-sm mb-6">รับไอเทมเอ็กซ์คลูซีฟและสิทธิ์เข้าเล่น CBT ก่อนใคร</p>
+
+            <form id="registrationForm" onsubmit="handleRegistration(event)" class="space-y-4 text-left">
+                <div>
+                    <label for="email" class="block text-xs md:text-sm font-medium text-slate-300 mb-1">อีเมล (Email)</label>
+                    <input type="email" id="email" required placeholder="name@example.com" class="w-full px-4 py-3 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl text-white placeholder-slate-500 focus:outline-none text-sm">
+                </div>
+
+                <div>
+                    <label for="phone" class="block text-xs md:text-sm font-medium text-slate-300 mb-1">เบอร์โทรศัพท์ (Phone Number)</label>
+                    <input type="tel" id="phone" required pattern="[0-9]{9,10}" placeholder="08XXXXXXXX" class="w-full px-4 py-3 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl text-white placeholder-slate-500 focus:outline-none text-sm">
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-extrabold rounded-xl shadow-lg transition duration-300 text-base mt-2 flex justify-center items-center">
+                    <span id="btnText">รับสิทธิ์ทดสอบ CBT & ไอเทมฟรี</span>
+                </button>
+            </form>
+
+            <div id="successMessage" role="status" class="hidden mt-4 p-4 bg-emerald-950/80 border border-emerald-500/40 rounded-xl text-emerald-300 text-sm">
+                🎉 ลงทะเบียนสำเร็จ! ข้อมูลถูกบันทึกแล้ว สิทธิ์และโค้ดของรางวัลจะถูกส่งไปยังอีเมลของคุณเมื่อเปิด CBT
+            </div>
+            <div id="registrationError" role="alert" class="hidden mt-4 p-4 bg-red-950/80 border border-red-500/40 rounded-xl text-red-300 text-sm"></div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-950 border-t border-slate-800/80 py-8 px-4 text-center text-slate-500 text-sm">
+        <p class="text-xs text-slate-600 mb-2">เว็บไซต์นี้จัดทำขึ้นเพื่อการประชาสัมพันธ์เกม Aetheria Chronicles</p>
+        <p>&copy; 2026 Aetheria Chronicles. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbzfAeuOV1WFHaWmBPNyM1-PMwoKPyX3PSWEZykCMN0r-WUZNnFghdqNj4VU1-LppqdH/exec';
+      let registrationClosed = false;
+
+      // โหลดการตั้งค่าสาธารณะจาก Apps Script; การตรวจปิดรับสมัครจริงทำที่ backend ด้วย
+      window.addEventListener('DOMContentLoaded', async () => {
+        try {
+          const response = await fetch(scriptURL);
+          const data = await response.json();
+          if (data.status !== 'success') throw new Error(data.message || 'โหลดการตั้งค่าไม่สำเร็จ');
+
+          if (data.announcement && data.announcement.trim()) {
+            document.getElementById('announcementText').textContent = data.announcement;
+            document.getElementById('liveAnnouncementBar').classList.remove('hidden');
+          }
+          const submitBtn = document.getElementById('submitBtn');
+          const btnText = document.getElementById('btnText');
+          if (data.cbtStatus === 'closed') {
+            registrationClosed = true;
+            submitBtn.disabled = true;
+            btnText.textContent = 'ปิดรับสมัครชั่วคราว';
+            submitBtn.classList.add('bg-slate-700', 'text-slate-400', 'cursor-not-allowed');
+          }
+
+          if (data.pixelId && /^\d{5,20}$/.test(data.pixelId) && data.pixelStatus === 'active') {
+            const pixelScript = document.createElement('script');
+            pixelScript.text = `
+              !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+              n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+              (window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init','${data.pixelId}');fbq('track','PageView');
+            `;
+            document.head.appendChild(pixelScript);
+          }
+        } catch (err) {
+          console.error('Error fetching settings:', err);
+        }
+      });
+
+      function scrollToForm() {
+        document.getElementById('pre-register-form').scrollIntoView({ behavior: 'smooth' });
+      }
+
+      async function handleRegistration(event) {
+        event.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const successMsg = document.getElementById('successMessage');
+        const errorMsg = document.getElementById('registrationError');
+        successMsg.classList.add('hidden');
+        errorMsg.classList.add('hidden');
+        submitBtn.disabled = true;
+        btnText.textContent = 'กำลังลงทะเบียน...';
+
+        try {
+          const response = await fetch(scriptURL, {
+            method: 'POST',
+            body: JSON.stringify({
+              email: document.getElementById('email').value.trim(),
+              phone: document.getElementById('phone').value.trim()
+            })
+          });
+          const result = await response.json();
+          if (result.status !== 'success') throw new Error(result.message || 'ลงทะเบียนไม่สำเร็จ');
+
+          successMsg.classList.remove('hidden');
+          document.getElementById('registrationForm').reset();
+          if (typeof fbq === 'function') fbq('track', 'Lead');
+        } catch (error) {
+          console.error('Error submitting form:', error);
+          errorMsg.textContent = 'ลงทะเบียนไม่สำเร็จ: ' + error.message;
+          errorMsg.classList.remove('hidden');
+        } finally {
+          submitBtn.disabled = registrationClosed;
+          btnText.textContent = registrationClosed
+            ? 'ปิดรับสมัครชั่วคราว'
+            : 'รับสิทธิ์ทดสอบ CBT & ไอเทมฟรี';
+        }
+      }
+
+      function updateCountdown() {
+        const targetDate = new Date('2026-12-10T00:00:00+07:00').getTime();
+        const now = new Date().getTime();
+        const difference = targetDate - now;
+
+        if (difference > 0) {
+          const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+          document.getElementById('days').innerText = String(days).padStart(2, '0');
+          document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+          document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+          document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+        }
+      }
+
+      setInterval(updateCountdown, 1000);
+      updateCountdown();
+    </script>
+</body>
+</html>

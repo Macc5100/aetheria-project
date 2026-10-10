@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aetheria Chronicles - Pro Admin Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap');
+      body {
+        font-family: 'Kanit', sans-serif;
+        background-color: #06080d;
+        color: #e2e8f0;
+      }
+      .glass-card {
+        background: rgba(15, 23, 42, 0.75);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+      }
+      .gold-text {
+        background: linear-gradient(135deg, #fef08a, #f59e0b, #d97706);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
+
+    <!-- LOGIN MODAL -->
+    <div id="loginSection" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-xl px-4">
+        <div class="w-full max-w-md glass-card rounded-3xl p-8 shadow-2xl text-center border-amber-500/30">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h2 class="text-2xl font-bold gold-text mb-1">AETHERIA ADMIN</h2>
+            <p class="text-slate-400 text-xs mb-6">ระบบจัดการแคมเปญหลังบ้านระดับโปร</p>
+            <form onsubmit="handleLogin(event)" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1">รหัสผ่านแอดมิน</label>
+                    <input type="password" id="adminPassword" required placeholder="••••••••••••" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl text-white placeholder-slate-600 focus:outline-none text-sm text-center tracking-widest transition">
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 hover:brightness-110 text-slate-950 font-bold rounded-xl shadow-lg transition duration-300 text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-key"></i> เข้าสู่ระบบ
+                </button>
+            </form>
+            <p id="loginError" class="text-red-400 text-xs mt-3 hidden"><i class="fa-solid fa-triangle-exclamation mr-1"></i> รหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง</p>
+        </div>
+    </div>
+
+    <!-- MAIN ADMIN PANEL -->
+    <div id="adminPanel" class="hidden flex-1 flex flex-col">
+        <!-- Header Nav -->
+        <header class="bg-slate-950/90 border-b border-amber-500/20 px-6 py-4 sticky top-0 z-40 backdrop-blur-md flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                    <i class="fa-solid fa-dragon"></i>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold gold-text">Aetheria Chronicles Pro Console</h1>
+                    <p class="text-[10px] text-slate-500">Live Campaign & User Data Control</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span id="autoRefreshBadge" class="hidden md:inline-flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 px-3 py-1.5 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Real-time Sync
+                </span>
+                <a href="index.html" target="_blank" class="text-xs bg-slate-900 border border-slate-700 text-slate-300 px-3.5 py-2 rounded-xl hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> ดูหน้าเว็บหลัก
+                </a>
+                <button onclick="handleLogout()" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 px-3.5 py-2 rounded-xl text-xs transition">
+                    <i class="fa-solid fa-power-off"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 space-y-6">
+            
+            <!-- Quick Stats Metrics -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass-card rounded-2xl p-5 relative overflow-hidden">
+                    <div class="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">ยอดลงทะเบียนรวม</div>
+                    <div id="totalRegs" class="text-3xl font-extrabold gold-text">0</div>
+                    <p class="text-[11px] text-emerald-400 mt-2 flex items-center gap-1"><i class="fa-solid fa-arrow-trend-up"></i> อัปเดตล่าสุดจาก Google Sheets</p>
+                </div>
+                <div class="glass-card rounded-2xl p-5">
+                    <div class="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">สถานะ Meta Pixel</div>
+                    <div id="pixelStatusBadge" class="text-xl font-bold text-emerald-400 flex items-center mt-1">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse mr-2"></span> ทำงานปกติ (Active)
+                    </div>
+                    <p id="pixelIdDisplay" class="text-[11px] text-slate-400 mt-2">ID: กำลังตรวจสอบ...</p>
+                </div>
+                <div class="glass-card rounded-2xl p-5">
+                    <div class="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">สถานะระบบ Backend</div>
+                    <div class="text-xl font-bold text-emerald-400 flex items-center mt-1">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse mr-2"></span> Active Ready
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-2">Google Apps Script Connected</p>
+                </div>
+                <div class="glass-card rounded-2xl p-5">
+                    <div class="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">นับถอยหลังสู่ CBT</div>
+                    <div class="text-2xl font-bold text-amber-300">10 ธ.ค. 2569</div>
+                    <p class="text-[11px] text-slate-500 mt-2">กำหนดการเปิดทดสอบอย่างเป็นทางการ</p>
+                </div>
+            </div>
+
+            <!-- Campaign Controls & Meta Pixel Manager -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Announcement & Pixel Control (Left 2 Cols) -->
+                <div class="lg:col-span-2 glass-card rounded-2xl p-6 space-y-5">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-base font-bold text-amber-300 flex items-center gap-2">
+                                <i class="fa-solid fa-bullhorn text-amber-400"></i> จัดการข้อความประกาศด่วน (Live Banner)
+                            </h3>
+                        </div>
+                        <textarea id="announcementInput" rows="2" placeholder="กรอกข้อความประกาศ เช่น 'กิจกรรมสุ่มแจกสิทธิ์ CBT พิเศษเพิ่ม 500 รางวัล!'" class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-xs md:text-sm text-slate-200 focus:border-amber-500 focus:outline-none"></textarea>
+                    </div>
+
+                    <!-- Meta Pixel Management Box -->
+                    <div class="pt-4 border-t border-slate-800">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-sm font-bold text-blue-400 flex items-center gap-2">
+                                <i class="fa-brands fa-meta"></i> ตั้งค่าและสถานะ Meta Pixel
+                            </h3>
+                            <span id="pixelLiveIndicator" class="text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-semibold">● กำลังทำงาน</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[11px] text-slate-400 mb-1">Meta Pixel ID</label>
+                                <input type="text" id="pixelIdInput" placeholder="เช่น 123456789012345" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:border-amber-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] text-slate-400 mb-1">สถานะการทำงาน (Pixel Status)</label>
+                                <select id="pixelWorkingStatus" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:border-amber-500 focus:outline-none">
+                                    <option value="active">🟢 ทำงานปกติ (Active)</option>
+                                    <option value="inactive">🔴 ปิดใช้งานชั่วคราว (Inactive)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs text-slate-400">สถานะเปิดรับสมัคร:</span>
+                            <select id="cbtStatusSelect" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:border-amber-500 focus:outline-none">
+                                <option value="open">🟢 เปิดรับลงทะเบียน</option>
+                                <option value="closed">🔴 ปิดรับสมัคร</option>
+                            </select>
+                        </div>
+                        <button onclick="saveCampaignSettings()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5 shadow-md">
+                            <i class="fa-solid fa-floppy-disk"></i> บันทึกการตั้งค่าทั้งหมด
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Growth Graph Chart (Right 1 Col) -->
+                <div class="glass-card rounded-2xl p-6 flex flex-col justify-between">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">แนวโน้มการเติบโตรายวัน</h3>
+                    <div class="h-32">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                    <p class="text-[10px] text-slate-500 text-center mt-2">แสดงสถิติย้อนหลังแบบอัตโนมัติ</p>
+                </div>
+            </div>
+
+            <!-- Main Registrations Table -->
+            <div class="glass-card rounded-2xl p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-amber-300 flex items-center gap-2">
+                            <i class="fa-solid fa-users text-amber-400"></i> รายชื่อผู้ลงทะเบียนรับสิทธิ์ CBT
+                        </h2>
+                        <p class="text-xs text-slate-400">ข้อมูลที่รวบรวมจาก Google Sheets สำหรับส่งโค้ดไอเทมและทำ Facebook Custom Audience</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="ค้นหาอีเมลหรือเบอร์โทร..." class="px-4 py-2 bg-slate-950 border border-slate-800 focus:border-amber-500 rounded-xl text-white text-xs placeholder-slate-500 focus:outline-none w-full md:w-56">
+                        <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-csv"></i> ส่งออก CSV
+                        </button>
+                        <button onclick="fetchRegistrations()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-arrows-rotate"></i> รีเฟรช
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table Container -->
+                <div class="overflow-x-auto rounded-xl border border-slate-800">
+                    <table id="regTable" class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-950 text-slate-400 text-[11px] uppercase border-b border-slate-800 tracking-wider">
+                                <th class="p-4">ลำดับ</th>
+                                <th class="p-4">วัน-เวลาที่ลงทะเบียน</th>
+                                <th class="p-4">อีเมล (Email)</th>
+                                <th class="p-4">เบอร์โทรศัพท์ (Phone)</th>
+                                <th class="p-4">สถานะสิทธิ์</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-slate-800/60 text-xs text-slate-300">
+                            <tr>
+                                <td colspan="5" class="p-8 text-center text-slate-500">กำลังดึงข้อมูลเรียลไทม์...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Pro Tip Box for Meta Ads -->
+            <div class="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-5 flex items-start gap-4">
+                <div class="text-amber-400 text-xl mt-0.5"><i class="fa-solid fa-lightbulb"></i></div>
+                <div class="text-xs text-slate-300 space-y-1">
+                    <h4 class="font-bold text-amber-300">เทคนิคการยิง Facebook Ads ให้ได้ผลลัพธ์คุ้มค่าที่สุด:</h4>
+                    <p class="text-slate-400">นำไฟล์ CSV ที่ดาวน์โหลดจากตารางไปอัปโหลดสร้าง <b>Custom Audience</b> ใน Meta Ads Manager เพื่อยิงโฆษณา Retargeting ย้ำเตือนวันเปิด CBT หรือทำ <b>Lookalike Audience 1%-2%</b> เพื่อหาคนที่มีโปรไฟล์ใกล้เคียงผู้เล่นที่ลงทะเบียนแล้ว</p>
+                </div>
+            </div>
+
+        </main>
+
+        <footer class="bg-slate-950 border-t border-slate-800/80 py-4 px-6 text-center text-slate-500 text-xs">
+            Aetheria Chronicles Pro Console &copy; 2026. All Rights Reserved.
+        </footer>
+    </div>
+
+    <script>
+      const scriptURL = 'https://script.google.com/macros/s/AKfycbzfAeuOV1WFHaWmBPNyM1-PMwoKPyX3PSWEZykCMN0r-WUZNnFghdqNj4VU1-LppqdH/exec';
+      const TOKEN_KEY = 'aetheria_admin_token';
+
+      let cachedData = [];
+      let chartInstance = null;
+
+      window.onload = function() {
+        if (sessionStorage.getItem(TOKEN_KEY)) showAdminPanel();
+      };
+
+      async function postAPI(payload) {
+        const response = await fetch(scriptURL, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (!result || result.status !== 'success') {
+          throw new Error(result && result.message ? result.message : 'คำขอไม่สำเร็จ');
+        }
+        return result;
+      }
+
+      async function handleLogin(event) {
+        event.preventDefault();
+        const err = document.getElementById('loginError');
+        err.classList.add('hidden');
+        try {
+          const result = await postAPI({
+            action: 'adminLogin',
+            password: document.getElementById('adminPassword').value
+          });
+          sessionStorage.setItem(TOKEN_KEY, result.token);
+          showAdminPanel();
+        } catch (error) {
+          err.textContent = error.message === 'Invalid admin password'
+            ? 'รหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง'
+            : 'เข้าสู่ระบบไม่สำเร็จ: ' + error.message;
+          err.classList.remove('hidden');
+        }
+      }
+
+      async function handleLogout() {
+        const token = sessionStorage.getItem(TOKEN_KEY);
+        sessionStorage.removeItem(TOKEN_KEY);
+        if (token) {
+          try { await postAPI({ action: 'adminLogout', token }); } catch (error) { console.warn(error); }
+        }
+        document.getElementById('adminPanel').classList.add('hidden');
+        document.getElementById('loginSection').classList.remove('hidden');
+        document.getElementById('adminPassword').value = '';
+      }
+
+      function showAdminPanel() {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('adminPanel').classList.remove('hidden');
+        fetchRegistrations();
+        initChart();
+      }
+
+      function requireLoginAgain() {
+        sessionStorage.removeItem(TOKEN_KEY);
+        document.getElementById('adminPanel').classList.add('hidden');
+        document.getElementById('loginSection').classList.remove('hidden');
+      }
+      
+      async function fetchRegistrations() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-amber-400 animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-2"></i>กำลังโหลดข้อมูลล่าสุด...</td></tr>`;
+        try {
+          const data = await postAPI({
+            action: 'getRegistrations',
+            token: sessionStorage.getItem(TOKEN_KEY)
+          });
+          cachedData = Array.isArray(data.registrations) ? data.registrations : [];
+          renderTable(cachedData);
+          document.getElementById('totalRegs').innerText = cachedData.length.toLocaleString();
+          document.getElementById('announcementInput').value = data.announcement || '';
+          document.getElementById('cbtStatusSelect').value = data.cbtStatus || 'closed';
+          document.getElementById('pixelIdInput').value = data.pixelId || '';
+          document.getElementById('pixelIdDisplay').innerText = 'ID: ' + (data.pixelId || 'ไม่ได้ตั้งค่า');
+          document.getElementById('pixelWorkingStatus').value = data.pixelStatus || 'inactive';
+          updatePixelStatusUI(data.pixelStatus || 'inactive');
+          updateChart(cachedData);
+        } catch (err) {
+          console.error('Error:', err);
+          if (err.message === 'Unauthorized') {
+            requireLoginAgain();
+            return;
+          }
+          tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-red-400">โหลดข้อมูลไม่สำเร็จ: ${escapeHTML(err.message)}</td></tr>`;
+        }
+      }
+
+      function escapeHTML(value) {
+        return String(value).replace(/[&<>"']/g, char => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[char]);
+      }
+
+      function updatePixelStatusUI(status) {
+        const badge = document.getElementById('pixelStatusBadge');
+        const indicator = document.getElementById('pixelLiveIndicator');
+        if (status === 'active') {
+          badge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse mr-2"></span> ทำงานปกติ (Active)`;
+          badge.className = "text-xl font-bold text-emerald-400 flex items-center mt-1";
+          indicator.innerText = "● กำลังทำงาน";
+          indicator.className = "text-[10px] px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-semibold";
+        } else {
+          badge.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-red-500 mr-2"></span> ปิดใช้งาน (Inactive)`;
+          badge.className = "text-xl font-bold text-red-400 flex items-center mt-1";
+          indicator.innerText = "● ปิดใช้งาน";
+          indicator.className = "text-[10px] px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/30 font-semibold";
+        }
+      }
+
+      function renderTable(dataArray) {
+        const tbody = document.getElementById('tableBody');
+        if (dataArray.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-500">ไม่พบข้อมูลผู้ลงทะเบียน</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = dataArray.map((item, index) => {
+          const parsedDate = item.timestamp ? new Date(item.timestamp) : null;
+          const dateStr = parsedDate && !Number.isNaN(parsedDate.getTime())
+            ? parsedDate.toLocaleString('th-TH') : '-';
+          return `
+            <tr class="hover:bg-slate-800/40 transition">
+              <td class="p-4 font-mono text-amber-400">${index + 1}</td>
+              <td class="p-4 text-slate-400">${escapeHTML(dateStr)}</td>
+              <td class="p-4 font-semibold text-slate-100">${escapeHTML(item.email || '-')}</td>
+              <td class="p-4 text-slate-300 font-mono">${escapeHTML(item.phone || '-')}</td>
+              <td class="p-4"><span class="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-semibold">ยืนยันสิทธิ์ CBT</span></td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function filterTable() {
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = cachedData.filter(item => 
+          (item.email && item.email.toLowerCase().includes(input)) || 
+          (item.phone && item.phone.toLowerCase().includes(input))
+        );
+        renderTable(filtered);
+      }
+
+      async function saveCampaignSettings() {
+        const announcement = document.getElementById('announcementInput').value;
+        const cbtStatus = document.getElementById('cbtStatusSelect').value;
+        const pixelId = document.getElementById('pixelIdInput').value.trim();
+        const pixelStatus = document.getElementById('pixelWorkingStatus').value;
+        try {
+          await postAPI({
+            action: 'updateSettings',
+            token: sessionStorage.getItem(TOKEN_KEY),
+            announcement,
+            cbtStatus,
+            pixelId,
+            pixelStatus
+          });
+          updatePixelStatusUI(pixelStatus);
+          document.getElementById('pixelIdDisplay').innerText = 'ID: ' + (pixelId || 'ไม่ได้ตั้งค่า');
+          alert('บันทึกการตั้งค่าแคมเปญและ Meta Pixel เรียบร้อยแล้ว');
+        } catch (error) {
+          if (error.message === 'Unauthorized') requireLoginAgain();
+          alert('บันทึกไม่สำเร็จ: ' + error.message);
+        }
+      }
+
+      function exportToCSV() {
+        if (cachedData.length === 0) {
+          alert('ไม่มีข้อมูลสำหรับส่งออก');
+          return;
+        }
+        const csvCell = value => {
+          let text = String(value ?? '');
+          if (['=', '+', '-', '@', '\t', '\r'].includes(text.charAt(0))) text = "'" + text;
+          return '"' + text.replace(/"/g, '""') + '"';
+        };
+        const rows = [['Timestamp', 'Email', 'Phone']];
+        cachedData.forEach(row => rows.push([row.timestamp, row.email, row.phone]));
+        const csvContent = String.fromCharCode(0xFEFF) + rows.map(row => row.map(csvCell).join(',')).join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Aetheria_CBT_Registrations.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+      }
+
+      function initChart() {
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        if (chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: [],
+            datasets: [{
+              label: 'จำนวนคนลงทะเบียน',
+              data: [],
+              backgroundColor: 'rgba(245, 158, 11, 0.6)',
+              borderColor: 'rgba(245, 158, 11, 1)',
+              borderWidth: 1,
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } },
+              y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { size: 9 }, precision: 0 } }
+            }
+          }
+        });
+        updateChart(cachedData);
+      }
+
+      function updateChart(data) {
+        if (!chartInstance) return;
+        const today = new Date();
+        const days = Array.from({ length: 5 }, (_, index) => {
+          const date = new Date(today);
+          date.setHours(0, 0, 0, 0);
+          date.setDate(date.getDate() - (4 - index));
+          return date;
+        });
+        const counts = days.map(day => 0);
+        data.forEach(item => {
+          const date = new Date(item.timestamp);
+          if (Number.isNaN(date.getTime())) return;
+          date.setHours(0, 0, 0, 0);
+          const index = days.findIndex(day => day.getTime() === date.getTime());
+          if (index !== -1) counts[index]++;
+        });
+        chartInstance.data.labels = days.map((day, index) =>
+          index === 4 ? 'วันนี้' : day.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })
+        );
+        chartInstance.data.datasets[0].data = counts;
+        chartInstance.update();
+      }
+    </script>
+</body>
+</html>
